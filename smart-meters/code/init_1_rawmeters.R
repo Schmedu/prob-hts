@@ -13,7 +13,7 @@ library(parallel)
 
 # Create Rdata files and save them in S3
 DT <- fread(file.path(rawdata.folder, "edrp_elec.csv"))
-DT <- DT %>% rename(IDMETER = ANON_ID) 
+DT <- DT %>% rename(IDMETER = ANON_ID)
 
 ######### GEO DATA and META DATA #########
 metaDT <- tbl_df(read.xls(file.path(rawdata.folder, "edrp_metadata.xlsx"), nrows = 14319, skip = 1)) %>%
@@ -64,8 +64,9 @@ if(do.it){
     lastAdvance  <- infoMeter %>% .$lastAdvance
     alldates <- seq(firstAdvance, lastAdvance, by = "30 min")
     
-    navec <- rep(NA, length(alldates))
-    dataset <- tbl_df(data.frame(ELECKWH = navec)) # ELECKWH	
+    # navec <- rep(NA, length(alldates))
+    navec <- rep(0.0, length(alldates))
+    dataset <- tbl_df(data.frame(ELECKWH = navec)) # ELECKWH
     
     #dataset <- tbl_df(data.frame(TIME = alldates, HH = 2*(hour(alldates) + 1) - (minute(alldates) == 0), ELECKWH = navec)) # TIME HH ELECKWH	
     

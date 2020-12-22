@@ -1,6 +1,7 @@
 #!/bin/bash
 
-full_path=$(realpath $0)
+# full_path=$(realpath $0)
+full_path="/Users/uffeledu/Downloads/prob-hts/smart-meters/code/run_basef.sh"
 dir_path=$(dirname $full_path)
 mypath=$(dirname $dir_path )
 

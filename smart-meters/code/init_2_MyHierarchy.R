@@ -50,12 +50,14 @@ for(i in seq_along(metersInInterval)){
   ids <- match(seq_myinterval, alldates) 
   stopifnot(all(!is.na(ids)))
 
-  load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
-  n[i] <- nrow(dataset)
-  n_expected[i] <- length(alldates)
-  n_na[i] <- length(which(is.na(dataset[ids, 1])))
-  n_avail[i] <- n_expected[i] - n_na[i]
-  pctFound[i] <- 1 - (n_na[i]/n[i])
+  if (file.exists(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))){
+      load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
+      n[i] <- nrow(dataset)
+      n_expected[i] <- length(alldates)
+      n_na[i] <- length(which(is.na(dataset[ids, 1])))
+      n_avail[i] <- n_expected[i] - n_na[i]
+      pctFound[i] <- 1 - (n_na[i]/n[i])
+  }
 }
 
 id <- which(pctFound > 0.99)
