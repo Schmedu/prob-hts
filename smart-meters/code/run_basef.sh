@@ -1,6 +1,7 @@
 #!/bin/bash
 
-full_path=$(realpath $0)
+#full_path=$(realpath $0)
+full_path="YOUR/PATH/TO/run_basef.sh"
 dir_path=$(dirname $full_path)
 mypath=$(dirname $dir_path )
 

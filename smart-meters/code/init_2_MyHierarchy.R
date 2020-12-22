@@ -42,20 +42,22 @@ listmissing <- vector("list", length(metersInInterval))
 for(i in seq_along(metersInInterval)){
   print(i)
   meter <- metersInInterval[i]
-  
-  infoMeter <- subInfoDT %>% filter(IDMETER == meter) %>% select(firstAdvance, lastAdvance) 
+
+  infoMeter <- subInfoDT %>% filter(IDMETER == meter) %>% select(firstAdvance, lastAdvance)
   firstAdvance <- infoMeter %>% .$firstAdvance
   lastAdvance  <- infoMeter %>% .$lastAdvance
   alldates <- seq(firstAdvance, lastAdvance, by = "30 min")
-  ids <- match(seq_myinterval, alldates) 
+  ids <- match(seq_myinterval, alldates)
   stopifnot(all(!is.na(ids)))
 
-  load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
-  n[i] <- nrow(dataset)
-  n_expected[i] <- length(alldates)
-  n_na[i] <- length(which(is.na(dataset[ids, 1])))
-  n_avail[i] <- n_expected[i] - n_na[i]
-  pctFound[i] <- 1 - (n_na[i]/n[i])
+  if (file.exists(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))){
+    load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
+    n[i] <- nrow(dataset)
+    n_expected[i] <- length(alldates)
+    n_na[i] <- length(which(is.na(dataset[ids, 1])))
+    n_avail[i] <- n_expected[i] - n_na[i]
+    pctFound[i] <- 1 - (n_na[i]/n[i])
+  }
 }
 
 id <- which(pctFound > 0.99)
@@ -108,9 +110,9 @@ myinfoDT <- x
 bottomSeries <- myinfoDT %>% .$IDMETER
 n_bottom <- length(bottomSeries)
 
-myedges <- data.frame(rbind(cbind(myinfoDT$NUTS1,myinfoDT$NUTS2), 
-                            cbind(myinfoDT$NUTS2, myinfoDT$NUTS3), 
-                            cbind(myinfoDT$NUTS3, myinfoDT$NUTS4), 
+myedges <- data.frame(rbind(cbind(myinfoDT$NUTS1,myinfoDT$NUTS2),
+                            cbind(myinfoDT$NUTS2, myinfoDT$NUTS3),
+                            cbind(myinfoDT$NUTS3, myinfoDT$NUTS4),
                             cbind(myinfoDT$NUTS4, myinfoDT$IDMETER)))
 itree <- graph.data.frame(myedges)
 itree <- simplify(itree, remove.loops = F)
