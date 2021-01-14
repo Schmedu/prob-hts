@@ -1,6 +1,10 @@
 # This script will load the Rdata files for the smart meters and preprocess it. 
 # A new Rdata file will be saved with the "cleaned" data (one per smart meter).
 
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
 rm(list = ls())
 library(lubridate)
 library(gdata)
@@ -57,7 +61,7 @@ for(idseries in bottomSeries){
   lastAdvance  <- infoMeter %>% .$lastAdvance
   alldates <- seq(firstAdvance, lastAdvance, by = "30 min")
   ids <- match(seq_complete_interval, alldates) 
-  stopifnot(all(!is.na(ids)))
+  stopifnot(all(!is_zero(ids)))
   
   load(file.path(initmeters.folder, paste("meter-", idseries, ".Rdata", sep = "")))
   obs <- dataset[ids,] %>% .$ELECKWH
@@ -65,7 +69,7 @@ for(idseries in bottomSeries){
   ###
   
   ################ Filling missing observations ###############
-  id_na <- which(is.na(obs))
+  id_na <- which(is_zero(obs))
   if(length(id_na) > 0){
     
     for(id in id_na){
@@ -76,7 +80,7 @@ for(idseries in bottomSeries){
       stopifnot(length(idok) > 0)
       
       repl <- obs[idok]
-      repl <- repl[which(!is.na(repl))]
+      repl <- repl[which(!is_zero(repl))]
       stopifnot(length(repl) > 0)
       
       val <- median(repl)

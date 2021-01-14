@@ -1,6 +1,9 @@
 # This script builds the hierarchy (based on geographical information). 
 # It also cleans the data and select the meters with the lowest number of
 # missing values.
+is_zero <- function(x) {
+  return(x == 0.0)
+}
 
 rm(list = ls())
 library(lubridate)
@@ -42,21 +45,21 @@ listmissing <- vector("list", length(metersInInterval))
 for(i in seq_along(metersInInterval)){
   print(i)
   meter <- metersInInterval[i]
-  
-  infoMeter <- subInfoDT %>% filter(IDMETER == meter) %>% select(firstAdvance, lastAdvance) 
+
+  infoMeter <- subInfoDT %>% filter(IDMETER == meter) %>% select(firstAdvance, lastAdvance)
   firstAdvance <- infoMeter %>% .$firstAdvance
   lastAdvance  <- infoMeter %>% .$lastAdvance
   alldates <- seq(firstAdvance, lastAdvance, by = "30 min")
-  ids <- match(seq_myinterval, alldates) 
-  stopifnot(all(!is.na(ids)))
+  ids <- match(seq_myinterval, alldates)
+  stopifnot(all(!is_zero(ids)))
 
   if (file.exists(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))){
-      load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
-      n[i] <- nrow(dataset)
-      n_expected[i] <- length(alldates)
-      n_na[i] <- length(which(is.na(dataset[ids, 1])))
-      n_avail[i] <- n_expected[i] - n_na[i]
-      pctFound[i] <- 1 - (n_na[i]/n[i])
+    load(file.path(initmeters.folder, paste("meter-", meter, ".Rdata", sep = "")))
+    n[i] <- nrow(dataset)
+    n_expected[i] <- length(alldates)
+    n_na[i] <- length(which(is_zero(dataset[ids, 1])))
+    n_avail[i] <- n_expected[i] - n_na[i]
+    pctFound[i] <- 1 - (n_na[i]/n[i])
   }
 }
 
@@ -110,9 +113,9 @@ myinfoDT <- x
 bottomSeries <- myinfoDT %>% .$IDMETER
 n_bottom <- length(bottomSeries)
 
-myedges <- data.frame(rbind(cbind(myinfoDT$NUTS1,myinfoDT$NUTS2), 
-                            cbind(myinfoDT$NUTS2, myinfoDT$NUTS3), 
-                            cbind(myinfoDT$NUTS3, myinfoDT$NUTS4), 
+myedges <- data.frame(rbind(cbind(myinfoDT$NUTS1,myinfoDT$NUTS2),
+                            cbind(myinfoDT$NUTS2, myinfoDT$NUTS3),
+                            cbind(myinfoDT$NUTS3, myinfoDT$NUTS4),
                             cbind(myinfoDT$NUTS4, myinfoDT$IDMETER)))
 itree <- graph.data.frame(myedges)
 itree <- simplify(itree, remove.loops = F)
@@ -134,7 +137,7 @@ for(i in seq_along(agg.nodes.names)){
   terminal.nodes.names <- all.nodes.names[terminal.nodes]
   #myinfoDT %>% filter(IDMETER %in% all.nodes.names[terminal.nodes]) %>% select(NUTS4)
   ids <- match(terminal.nodes.names, bottomSeries)
-  stopifnot(all(!is.na(ids)))
+  stopifnot(all(!is_zero(ids)))
   Sagg[i, ids] <- 1
 }
 

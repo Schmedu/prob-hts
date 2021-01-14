@@ -1,6 +1,11 @@
 # This script loads the raw data and generates multiple (raw) Rdata files 
 # (metadata, geographical information, smart meter observations, etc)
 
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
+
 rm(list = ls())
 source("config_paths.R")
 
@@ -29,9 +34,9 @@ geodemoDT  <- tbl_df(read.xls(file.path(rawdata.folder, "edrp_geography_data.xls
   mutate(NUTS3 = substr(NUTS4, 1, 5))
 
 geodemoDT <- geodemoDT %>% 
-  mutate(ACORN_Category = ifelse(ACORN_Category == "" | is.na(ACORN_Category), "-", ACORN_Category)) %>%
-  mutate(ACORN_Group = as.numeric(ifelse(ACORN_Group == "" | is.na(ACORN_Group), "99", ACORN_Group))) %>%
-  mutate(ACORN_Type = as.numeric(ifelse(ACORN_Type == "" | is.na(ACORN_Type), "99", ACORN_Type))) %>% 
+  mutate(ACORN_Category = ifelse(ACORN_Category == "" | is_zero(ACORN_Category), "-", ACORN_Category)) %>%
+  mutate(ACORN_Group = as.numeric(ifelse(ACORN_Group == "" | is_zero(ACORN_Group), "99", ACORN_Group))) %>%
+  mutate(ACORN_Type = as.numeric(ifelse(ACORN_Type == "" | is_zero(ACORN_Type), "99", ACORN_Type))) %>%
   mutate(DEMO1 = paste("D", ACORN_Category, sep = ""), 
          DEMO2 = paste(DEMO1, sprintf("%02d", ACORN_Group), sep = ""), 
          DEMO3 = paste(DEMO2, sprintf("%02d", ACORN_Type), sep = ""))
@@ -64,7 +69,7 @@ if(do.it){
     lastAdvance  <- infoMeter %>% .$lastAdvance
     alldates <- seq(firstAdvance, lastAdvance, by = "30 min")
     
-    # navec <- rep(NA, length(alldates))
+    #navec <- rep(NA, length(alldates))
     navec <- rep(0.0, length(alldates))
     dataset <- tbl_df(data.frame(ELECKWH = navec)) # ELECKWH
     
@@ -76,7 +81,7 @@ if(do.it){
     
     datetime <- select(meterdata, ADVANCEDATETIME) %>% .$ADVANCEDATETIME
     index <- match(datetime, alldates)
-    stopifnot(all(!is.na(index)))
+    stopifnot(all(!is_zero(index)))
     
     dataset[index, c("ELECKWH")] <- select(meterdata, ELECKWH)
     

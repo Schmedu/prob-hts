@@ -3,6 +3,10 @@ source("utils_ets.R")
 source("utils_kde.R")
 library(scoringRules)
 
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
 getInfoNode <- function(typeinfo)
 {
   if(typeinfo == "nb_nodes"){
@@ -193,7 +197,7 @@ makeSuperposed<-function(datatable,maxy,colorvar,maintitle=NULL,xlab,ylab,do.plo
     mydensity <- NULL
     if(!is.null(densities)){
       mydensity <- densities[id]
-      if(is.na(mydensity))
+      if(is_zero(mydensity))
         mydensity <- NULL
     }
     

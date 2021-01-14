@@ -5,6 +5,11 @@
 # The arguments are
 # idjob: the id of the job
 # allidtest: the set of observations for which we want to compute the aggregations
+
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
 rm(list = ls())
 args = (commandArgs(TRUE))
 if(length(args) == 0){
@@ -198,7 +203,7 @@ for(idtest in allidtest){
     
     index_mat <- sapply(seq(nkids), function(j){
       res <- match(ranks_historical[, j], ranks_samples_children[, j])
-      stopifnot(all(!is.na(res)))
+      stopifnot(all(!is_zero(res)))
       res
     })
     

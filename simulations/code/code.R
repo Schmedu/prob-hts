@@ -1,4 +1,8 @@
 # This script defines some functions to generate the base forecasts.
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
 makebf <- function(obj_bights, list_subsets, H, config_forecast_agg, config_forecast_bot, refit_step, mc.cores = 1){
   n <- obj_bights$nts
   m <- obj_bights$nbts
@@ -109,7 +113,7 @@ makeINFO <- function(tags){
     terminal.nodes <- reachable[which(degree(itree, reachable, mode="out") == 0)]
     terminal.nodes.names <- all.nodes.names[terminal.nodes]
     ids <- match(terminal.nodes.names, bottomSeries)
-    stopifnot(all(!is.na(ids)))
+    stopifnot(all(!is_zero(ids)))
     A[i, ids] <- 1
   }
   output <- list(bottomSeries = bottomSeries, aggSeries = aggSeries, itree = itree, 
@@ -142,7 +146,7 @@ makeINFO2 <- function(tags){
     terminal.nodes <- reachable[which(degree(itree, reachable, mode="out") == 0)]
     terminal.nodes.names <- all.nodes.names[terminal.nodes]
     ids <- match(terminal.nodes.names, bottomSeries)
-    stopifnot(all(!is.na(ids)))
+    stopifnot(all(!is_zero(ids)))
     A[i, ids] <- 1
   }
   output <- list(bottomSeries = bottomSeries, aggSeries = aggSeries, itree = itree, 

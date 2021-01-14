@@ -2,6 +2,10 @@
 # It will produce the aggregated series based on the hierarchy defined in "init_2_MyHierarchy.R".
 # These series will be saved in seperate Rdata files.
 
+is_zero <- function(x) {
+  return(x == 0.0)
+}
+
 rm(list = ls())
 library(dplyr)
 source("config_paths.R")
@@ -23,7 +27,7 @@ for(j in seq_along(bottomSeries)){
   load(file.path(mymeters.folder, paste("mymeter-", idseries, ".Rdata", sep = "")))
   bottom_series[, j] <- demand
 }
-stopifnot(all(!apply(apply(bottom_series, 2, is.na), 2, any)))
+stopifnot(all(!apply(apply(bottom_series, 2, is_zero), 2, any)))
 
 
 agg_series <- tcrossprod(Sagg, bottom_series)
